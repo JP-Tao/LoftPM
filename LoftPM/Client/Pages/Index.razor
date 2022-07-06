@@ -1,0 +1,78 @@
+﻿@page "/login"
+@inject IJSRuntime js
+
+<PageTitle>Index</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="mb-4">Dashboard</MudText>
+        <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Hello, @context.User.Identity.Name!</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:80px;">
+                    <MudIcon Icon="@Icons.Filled.Group" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Team</MudText>
+                        <MudText Typo="Typo.h5">15 000</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:80px;">
+                    <MudIcon Icon="@Icons.Filled.AutoAwesomeMotion" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"> Projects</MudText>
+                        <MudText Typo="Typo.h5">70 000</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:80px;">
+                    <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Tasks</MudText>
+                        <MudText Typo="Typo.h5">12%</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:80px;">
+                    <MudIcon Icon="@Icons.Filled.ErrorOutline" Color="Color.Warning" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Overdue</MudText>
+                        <MudText Typo="Typo.h5">3,6</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h2" Color="Color.Primary" Class="mb-4">Hello Guest!</MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+<AuthorizeView>
+    <Authorized>
+        <br /><br />
+        <button class ="btn btn-outline-primary" @onclick="DisplayGreetingAlter">Display Greeting Alter</button>
+    </Authorized>
+</AuthorizeView>
+
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private async Task DisplayGreetingAlter()
+    {
+        var authState = await authenticationState;
+        var message = $"Hello {authState.User.Identity.Name}";
+        await js.InvokeVoidAsync("alert", message);
+    }
+
+}
+
+
+

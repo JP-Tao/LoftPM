@@ -1,0 +1,7 @@
+﻿@page "/assignments"
+@attribute [Authorize(Roles = "Administrator,User")]
+<h3>Procedure</h3>
+@model.Name
+@code {
+    private Procedure model = new Procedure(); 
+}

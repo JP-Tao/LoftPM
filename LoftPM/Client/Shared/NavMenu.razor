@@ -1,0 +1,29 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/Dashboard" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    
+    <AuthorizeView Roles ="Administrator,User">
+        <Authorized>
+            <MudNavGroup Title="Project" Expanded="false">
+                <MudNavLink Href="/projects"  Match="NavLinkMatch.Prefix">Projects</MudNavLink>
+                <MudNavLink Href="/assignments"  Match="NavLinkMatch.Prefix">Tasks</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Administrator">
+        <Authorized>
+            <MudNavLink Href="/teamMembers" Match="NavLinkMatch.Prefix">Team</MudNavLink>
+            <MudNavLink Href="/projectManagers" Match="NavLinkMatch.Prefix">Project Managers</MudNavLink>
+            <MudNavLink Href="/departments" Match="NavLinkMatch.Prefix">Departments</MudNavLink>
+        </Authorized>  
+    </AuthorizeView>
+
+    <AuthorizeView Roles ="Administrator,User">
+        <Authorized>
+            <MudNavGroup Title="Profile" Expanded="false">
+                <MudNavLink Href="/profile"  Match="NavLinkMatch.Prefix">Profile</MudNavLink>
+                <MudNavLink Href="/settings"  Match="NavLinkMatch.Prefix">Settings</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
+</MudNavMenu>

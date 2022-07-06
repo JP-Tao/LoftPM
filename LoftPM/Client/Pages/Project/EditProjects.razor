@@ -1,0 +1,112 @@
+﻿@page "/project"
+@page "/project/{id:int}"
+@attribute [Authorize(Roles = "Administrator, User")]
+@inject IProjectService ProjectService
+
+@if(Id == null)
+{
+    <PageTitle>Create a new Project</PageTitle>
+    <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Create a new Project</MudText>
+}
+else
+{
+    <PageTitle>Edit @project.Name</PageTitle>
+    <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Edit @project.Name</MudText>
+}
+<EditForm Model="project" OnSubmit="HandleSubmit">
+     <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="project.Name" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="clientName">Client</label>
+        <InputText id="clientName" @bind-Value="project.ClientName" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="status">Status</label>
+        <InputText id="status" @bind-Value="project.Status" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="startDate">Date Initialised</label>
+        <InputDate id="startDate" @bind-Value="project.DateInitialised" class="form-control"></InputDate>
+    </div>
+    <div>
+        <label for="endDate">Date of Completion</label>
+        <InputDate id="endDate" @bind-Value="project.DateToBeComplete" class="form-control"></InputDate>
+    </div>
+    <div>
+        <label>Manager</label><br />
+        <InputSelect @bind-Value="project.ProjectManagerId" class="form-select">
+            @foreach (var manager in ProjectService.ProjectManagers)
+            {
+                <option value="@manager.Id">@manager.FirstName</option>
+            }
+        </InputSelect>
+    </div>
+    <!--<div>
+        <label>Department</label><br />
+        <InputSelect @bind-Value="project.ProjectManager.DepartmentId" class="form-select">
+            @foreach (var dept in ProjectService.Departments)
+            {
+                <option value="@dept.Id">@dept.Name</option>
+            }
+        </InputSelect>
+    </div>-->
+    <br />
+    <button type="submit" class="btn btn-primary" >@btnText</button>
+    <button type="button" class="btn btn-danger" @onclick="DeleteProject">Delete Project </button>
+</EditForm>
+
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    Project project = new Project { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Project" : "Update Project";
+        await ProjectService.GetProjectManagers();
+        //await ProjectService.GetDepartments();
+
+        project.DateInitialised = DateTime.Today;
+        project.DateToBeComplete = DateTime.Today;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id == null)
+        {
+            project.ProjectManager = ProjectService.ProjectManagers[0];
+            project.ProjectManagerId = project.ProjectManagerId;
+
+            //project.ProjectManager.Department = ProjectService.Departments[0];
+            //project.ProjectManager.DepartmentId = project.ProjectManager.DepartmentId;
+
+        }
+        else
+        {
+            project = await ProjectService.GetSingleProject((int)Id);
+        }
+    }
+    async Task HandleSubmit()
+    {
+        if(Id == null)
+        {
+            await ProjectService.CreateProject(project);
+        }
+        else
+        {
+            await ProjectService.UpdateProject(project);
+        }
+    }
+    async Task DeleteProject()
+    {
+        await ProjectService.DeleteProject(project.Id);
+    }
+
+}

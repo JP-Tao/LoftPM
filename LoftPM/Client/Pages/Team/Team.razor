@@ -1,0 +1,83 @@
+﻿@page "/teamMember"
+@page "/teamMember/{id:int}"
+@attribute [Authorize(Roles = "Administrator")]
+@inject ITeamMemberService TeamMemberService
+
+@if(Id == null)
+{
+    <PageTitle>Create a new Team Member</PageTitle>
+    <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Create a new Team Member</MudText>
+}
+else
+{
+    <PageTitle>Edit @teamMember.FirstName</PageTitle>
+    <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Edit @teamMember.FirstName</MudText>
+}
+<EditForm Model="teamMember" OnSubmit="HandleSubmit">
+    <div>
+        <label for="firstName">FirstName</label>
+        <InputText id="firstName" @bind-Value="teamMember.FirstName" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="lastName">LastName</label>
+        <InputText id="lastName" @bind-Value="teamMember.LastName" class="form-control"></InputText>
+    </div>
+    <div>
+        <label>Department</label><br />
+        <InputSelect @bind-Value="teamMember.DepartmentId" class="form-select">
+            @foreach (var department in TeamMemberService.Departments)
+            {
+                <option value="@department.Id">@department.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary" >@btnText</button>
+    <button type="button" class="btn btn-danger" @onclick="DeleteTeamMember">Delete Team Member</button>
+</EditForm>
+
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    TeamMember teamMember = new TeamMember { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Team Member" : "Update Team Member";
+        await TeamMemberService.GetDepartments();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id == null)
+        {
+            teamMember.Department = TeamMemberService.Departments[0];
+            teamMember.DepartmentId = teamMember.DepartmentId;
+        }
+        else
+        {
+            teamMember = await TeamMemberService.GetSingleTeamMember((int)Id);
+        }
+    }
+    async Task HandleSubmit()
+    {
+        if(Id == null)
+        {
+            await TeamMemberService.CreateTeamMember(teamMember);
+        }
+        else
+        {
+            await TeamMemberService.UpdateTeamMember(teamMember);
+        }
+    }
+    async Task DeleteTeamMember()
+    {
+        await TeamMemberService.DeleteTeamMember(teamMember.Id);
+    }
+
+}

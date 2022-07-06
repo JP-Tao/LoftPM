@@ -1,0 +1,58 @@
+﻿@page "/projects"
+@attribute [Authorize(Roles = "Administrator,User")]
+@inject IProjectService ProjectService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Projects</MudText>
+
+
+    <MudSimpleTable Hover="true" Striped="true">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Start On</th>
+                <th>End On</th>
+                <th>Manager</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var project in ProjectService.Projects)
+            {
+                <tr>
+                    <td>@project.Name</td>
+                    <td>@project.ClientName</td>
+                    <td>@project.Status</td>
+                    <td>@project.DateInitialised</td>
+                    <td>@project.DateToBeComplete</td>
+                    <td>@project.ProjectManager.FirstName</td>
+                    <td>
+                        <button class= "btn btn-primary" @onclick="(() => ShowManager(project.Id))"><i class="oi oi-pencil"></i></button>
+                    </td>
+                    
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+    <br />
+    <button class="btn btn-primary" @onclick="CreateNewProject">Create New Project</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ProjectService.GetProjects();
+        //await ProjectManagerService.GetDepartments();
+    }
+
+    void ShowManager(int id)
+    {
+        NavigationManager.NavigateTo($"project/{id}");   
+    }
+    void CreateNewProject()
+    {
+        NavigationManager.NavigateTo("/project"); 
+    }
+
+}

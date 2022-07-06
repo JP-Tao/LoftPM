@@ -1,0 +1,65 @@
+﻿@page "/departments"
+@attribute [Authorize(Roles = "Administrator")]
+@inject IDepartmentService DepartmentService
+@inject NavigationManager NavigationManager
+@using LoftPM.Client.Authentication
+@using LoftPM.Shared
+@using System.Net.Http.Headers
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject HttpClient Http
+
+<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Departments</MudText>
+
+
+    <MudSimpleTable Hover="true" Striped="true">
+        <thead>
+            <tr>
+                <th>Department Name</th>
+                <th>City</th>
+                <th>Telephone</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var department in DepartmentService.Departments)
+            {
+                <tr>
+                    <td>@department.Name</td>
+                    <td>@department.City</td>
+                    <td>@department.Telephone</td>
+                    <td>
+                        <button class= "btn btn-primary" @onclick="(() => ShowDepartment(department.Id))"><i class="oi oi-pencil"></i></button>
+                    </td>
+                    
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+    <br />
+    <button class="btn btn-primary" @onclick="CreateNewDepartment">Create New Department</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+        var token = await customAuthStateProvider.GetToken();
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+            await DepartmentService.GetDepartments();
+        }
+        else
+            NavigationManager.NavigateTo("/login");
+        
+    }
+
+    void ShowDepartment(int id)
+    {
+        NavigationManager.NavigateTo($"department/{id}");   
+    }
+    void CreateNewDepartment()
+    {
+        NavigationManager.NavigateTo("/department"); 
+    }
+
+}

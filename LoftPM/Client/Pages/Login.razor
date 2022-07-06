@@ -1,0 +1,97 @@
+﻿@page "/"
+@layout LoginLayout
+@using LoftPM.Client.Authentication
+@using System.Net
+@inject HttpClient httpClient
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
+
+
+
+<div class="wrapper">
+    
+    <br /><br />
+    <br /><br />
+    <br /><br />
+    <div class="row" >
+    
+        <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+            <div class="mb-3 text-center">
+                <h3>Login</h3>
+            </div>
+            <div class="mb-3">
+                <label>User Name</label>
+                <input @bind="loginRequest.UserName" class="form-control" placeholder="User Name" />
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input @bind="loginRequest.Password" type="password"  class="form-control" placeholder="Password" />
+            </div>
+            <div class="mb-3 d-grid gap-2">
+                <label>User Name</label>
+                <button @onclick="Authenticate" class="btn btn-primary" >Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private LoginRequest loginRequest = new LoginRequest();
+    private async Task Authenticate()
+    {
+        var loginResponse = await httpClient.PostAsJsonAsync<LoginRequest>("/api/Account/Login", loginRequest);
+        if (loginResponse.IsSuccessStatusCode)
+        {
+            var userSession = await loginResponse.Content.ReadFromJsonAsync<UserSession>();
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(userSession);
+            navManager.NavigateTo("/Dashboard", true);
+        }
+        else if(loginResponse.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            await js.InvokeVoidAsync("alert", "Invalid User Name or Password");
+            return;
+        }
+    }
+
+<!--
+
+<MudGrid>
+    
+    <MudItem xs = "12">
+        
+
+
+<EditForm  Model="@_tokenModel" OnValidSubmit="SubmitAsync">
+    <FluentValidationValidator @ref="_fluentValidationValidator" />
+    <MudGrid>
+        <DataAnnotationsValidator />
+         <MudItem xs="12">
+            <MudTextField T="string" Label="@_localizer["E-mail"]" Variant="Variant.Outlined"
+                          @bind-Value="_tokenModel.Email" For="@(() => _tokenModel.Email)" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudTextField Label="@_localizer["Password"]" Variant="Variant.Outlined"
+                          @bind-Value="_tokenModel.Password" For="@(() => _tokenModel.Password)"
+                          InputType="@_passwordInput" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+        </MudItem>
+        <MudItem xs="12" Class="d-flex justify-center">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Disabled="@(!Validated)" Color="Color.Primary" Size="Size.Large" Style="width: 100%;">@_localizer["Sign In"]</MudButton>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+
+    </MudItem>
+    
+</MudGrid>
+-->
+
+
+
+
+}

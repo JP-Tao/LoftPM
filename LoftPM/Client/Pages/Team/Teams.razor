@@ -1,0 +1,55 @@
+﻿@page "/teamMembers"
+@attribute [Authorize(Roles = "Administrator")]
+@inject ITeamMemberService TeamMemberService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Team</MudText>
+
+
+    <MudSimpleTable Hover="true" Striped="true">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Department</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var team in TeamMemberService.TeamMembers)
+            {
+                <tr>
+                    <td>@team.FirstName</td>
+                    <td>@team.LastName</td>
+                    <td>@team.Department.Name</td>
+                    <td>
+                        <button class= "btn btn-primary" @onclick="(() => ShowTeam(team.Id))"><i class="oi oi-pencil"></i></button>
+                    </td>
+                    
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+    <br />
+    <button class="btn btn-primary" @onclick="CreateNewTeamMember">Create New Team Member</button>
+
+@code {
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TeamMemberService.GetTeamMembers();
+        await TeamMemberService.GetDepartments();
+    }
+
+    void ShowTeam(int id)
+    {
+        NavigationManager.NavigateTo($"teamMember/{id}");   
+    }
+    void CreateNewTeamMember()
+    {
+        NavigationManager.NavigateTo("/teamMember"); 
+    }
+
+}

@@ -1,0 +1,52 @@
+﻿@page "/projectManagers"
+@attribute [Authorize(Roles = "Administrator")]
+@inject IProjectManagerService ProjectManagerService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Project Managers</MudText>
+
+
+    <MudSimpleTable Hover="true" Striped="true">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Department</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var manager in ProjectManagerService.ProjectManagers)
+            {
+                <tr>
+                    <td>@manager.FirstName</td>
+                    <td>@manager.LastName</td>
+                    <td>@manager.Department.Name</td>
+                    <td>
+                        <button class= "btn btn-primary" @onclick="(() => ShowManager(manager.Id))"><i class="oi oi-pencil"></i></button>
+                    </td>
+                    
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+    <br />
+    <button class="btn btn-primary" @onclick="CreateNewManager">Create New Project Manager</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ProjectManagerService.GetProjectManagers();
+        //await ProjectManagerService.GetDepartments();
+    }
+
+    void ShowManager(int id)
+    {
+        NavigationManager.NavigateTo($"projectManager/{id}");   
+    }
+    void CreateNewManager()
+    {
+        NavigationManager.NavigateTo("/projectManager"); 
+    }
+
+}
